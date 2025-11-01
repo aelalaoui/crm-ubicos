@@ -233,42 +233,88 @@ The application uses JWT-based authentication with refresh tokens:
 
 ## 🚀 Deployment
 
-### Railway
+### Quick Deploy to Railway
 
-1. **Create Railway project**
+**Option 1: One-Click Deploy (Easiest)**
+
+See [RAILWAY_QUICKSTART.md](./RAILWAY_QUICKSTART.md) for a step-by-step guide.
+
+**Option 2: Railway CLI**
+
 ```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login and initialize
+railway login
 railway init
-```
 
-2. **Add PostgreSQL and Redis**
-```bash
-railway add postgresql
-railway add redis
-```
+# Add databases
+railway add --database postgresql
+railway add --database redis
 
-3. **Set environment variables**
-```bash
-railway variables set JWT_SECRET=your-secret
+# Set environment variables
+railway variables set JWT_SECRET=your-secret-key
 railway variables set JWT_REFRESH_SECRET=your-refresh-secret
-# ... other variables
-```
+railway variables set NODE_ENV=production
 
-4. **Deploy**
-```bash
+# Deploy
 railway up
+
+# Run migrations
+railway run npm run prisma:migrate:deploy --workspace=apps/api
 ```
 
-### GitHub Actions
+**Option 3: CI/CD with GitHub Actions**
 
-The project includes a CI/CD pipeline that:
-- Runs tests on every push/PR
-- Lints and type-checks code
-- Builds the application
-- Deploys to Railway on main branch
+The project includes automated deployment via GitHub Actions.
 
-Configure these secrets in GitHub:
-- `RAILWAY_TOKEN` - Railway API token
-- `RAILWAY_SERVICE` - Railway service name
+Configure these secrets in your GitHub repository (Settings → Secrets and variables → Actions):
+- `RAILWAY_TOKEN` - Get from Railway: Settings → Tokens
+- `RAILWAY_API_SERVICE` - Your API service ID from Railway
+- `RAILWAY_WEB_SERVICE` - Your Web service ID from Railway
+
+Push to `main` or `master` branch to trigger automatic deployment.
+
+### Detailed Deployment Guides
+
+- 📖 **Full Guide**: [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) - Complete deployment documentation
+- 🚀 **Quick Start**: [RAILWAY_QUICKSTART.md](./RAILWAY_QUICKSTART.md) - Get deployed in 10 minutes
+- 🛠️ **Setup Scripts**:
+  - Linux/Mac: `bash scripts/railway-setup.sh`
+  - Windows: `scripts\railway-setup.bat`
+
+### Environment Variables for Production
+
+**API Service** (`.env.railway.api`):
+```env
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+REDIS_URL=${{Redis.REDIS_URL}}
+JWT_SECRET=your-secure-secret-min-32-chars
+JWT_REFRESH_SECRET=your-secure-refresh-secret-min-32-chars
+NODE_ENV=production
+PORT=3001
+CORS_ORIGIN=https://your-frontend-url.railway.app
+```
+
+**Web Service** (`.env.railway.web`):
+```env
+NEXT_PUBLIC_API_URL=https://your-api-url.railway.app
+NEXT_PUBLIC_WS_URL=wss://your-api-url.railway.app
+NODE_ENV=production
+```
+
+### Other Deployment Options
+
+The application can also be deployed to:
+- **Vercel** (Frontend) + **Railway** (Backend)
+- **Netlify** (Frontend) + **Railway** (Backend)
+- **AWS** (ECS/Fargate)
+- **Google Cloud Run**
+- **Azure Container Apps**
+- **Self-hosted** with Docker Compose
+
+See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for more deployment options.
 
 ## 📝 Development Scripts
 

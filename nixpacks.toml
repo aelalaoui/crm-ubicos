@@ -1,0 +1,17 @@
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs_18", "python3"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = [
+  "npm run prisma:generate --workspace=apps/api",
+  "npm run build --workspace=apps/api",
+  "npm run build --workspace=apps/web"
+]
+
+[start]
+cmd = "npm run start:prod"
