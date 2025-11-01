@@ -81,9 +81,14 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
+      - name: Link Railway project
+        run: railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
       - name: Deploy API to Railway
         working-directory: ./apps/api
-        run: railway up --service=${{ secrets.RAILWAY_API_SERVICE }} --environment=${{ secrets.RAILWAY_ENVIROMENT_PROD }}
+        run: railway up --service=${{ secrets.RAILWAY_API_SERVICE }} --environment=${{ secrets.RAILWAY_ENVIROMENT_PROD }} --verbose
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
@@ -100,8 +105,13 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
+      - name: Link Railway project
+        run: railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
       - name: Deploy Web to Railway
         working-directory: ./apps/web
-        run: railway up --service=${{ secrets.RAILWAY_WEB_SERVICE }} --environment=${{ secrets.RAILWAY_ENVIROMENT_PROD }}
+        run: railway up --service=${{ secrets.RAILWAY_WEB_SERVICE }} --environment=${{ secrets.RAILWAY_ENVIROMENT_PROD }} --verbose
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
