@@ -1,6 +1,6 @@
 FROM node:18-alpine AS builder
 
-RUN apk add --no-cache openssl1.1-compat
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ RUN npm run build
 
 FROM node:18-alpine AS runner
 
-RUN apk add --no-cache openssl1.1-compat
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
