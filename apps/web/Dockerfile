@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . ./
 
+RUN ls -la && echo "=== Checking directory structure ===" && find . -maxdepth 3 -type d
+
 RUN npm install
 
 RUN cd apps/web && npm run build
