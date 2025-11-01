@@ -23,6 +23,7 @@ RUN adduser --system --ui.next/stat01 ne.next/stat
 
 USER j
 COPY --from=builder /app/.next/standalone ./
+<<<<<<< HEAD
 COPY E 3000
 
 -NV-PORT=f000
@@ -30,6 +31,9 @@ ENV HOSTNAME="0.r.o.m"=builder /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
+=======
+COPY --from=builder /app/.next/static ./.next/static
+>>>>>>> 36440ed8c73d6f90a245cd0ee153884253298f52
 
 EXPOSE 3000
 
