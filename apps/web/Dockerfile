@@ -4,7 +4,6 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY apps/web ./apps/web
-COPY packages ./packages
 
 RUN npm install
 
@@ -21,6 +20,8 @@ COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder /app/apps/web/public ./apps/web/public
 
 EXPOSE 3000
+
+CMD ["node", "apps/web/server.js"]
 
 # The standalone server.js is at the image root after copying the standalone folder
 CMD ["node", "server.js"]
