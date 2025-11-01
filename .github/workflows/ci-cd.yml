@@ -83,7 +83,7 @@ jobs:
 
       - name: Deploy API to Railway
         working-directory: ./apps/api
-        run: railway up --service=${{ secrets.RAILWAY_API_SERVICE }} --project=${{ secrets.RAILWAY_PROJECT_ID }}
+        run: railway up --service=${{ secrets.RAILWAY_API_SERVICE }} --environment=${{ secrets.RAILWAY_ENVIROMENT_PROD }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
@@ -102,6 +102,6 @@ jobs:
 
       - name: Deploy Web to Railway
         working-directory: ./apps/web
-        run: railway up --service=${{ secrets.RAILWAY_WEB_SERVICE }} --project=${{ secrets.RAILWAY_PROJECT_ID }} --token=${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --service=${{ secrets.RAILWAY_WEB_SERVICE }} --environment=${{ secrets.RAILWAY_ENVIROMENT_PROD }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
