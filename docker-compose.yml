@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: solana-crm-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: solana_trading_crm
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - solana-crm-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: solana-crm-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - solana-crm-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: solana-crm-api
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/solana_trading_crm
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-refresh-secret-key-change-in-production}
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:3000
+      SNIPEROO_API_URL: ${SNIPEROO_API_URL}
+      SNIPEROO_API_KEY: ${SNIPEROO_API_KEY}
+    ports:
+      - '3001:3001'
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - solana-crm-network
+    command: sh -c "npx prisma migrate deploy && node dist/main"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: solana-crm-web
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_WS_URL: ws://localhost:3001
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+    networks:
+      - solana-crm-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  solana-crm-network:
+    driver: bridge
