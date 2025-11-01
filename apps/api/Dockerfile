@@ -1,5 +1,7 @@
 FROM node:18-alpine AS builder
 
+RUN apk add --no-cache openssl1.1-compat
+
 WORKDIR /app
 
 COPY . ./
@@ -10,6 +12,8 @@ RUN npm run prisma:generate
 RUN npm run build
 
 FROM node:18-alpine AS runner
+
+RUN apk add --no-cache openssl1.1-compat
 
 WORKDIR /app
 
