@@ -26,8 +26,9 @@ export function LoginForm() {
       const response = await authApi.login({ email, password });
       setAuth(response.user, response.accessToken, response.refreshToken);
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }

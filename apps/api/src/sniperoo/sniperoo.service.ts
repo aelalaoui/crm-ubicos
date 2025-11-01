@@ -31,19 +31,19 @@ export class SniperooService {
     throw new Error('Sniperoo integration not implemented yet (Phase 2)');
   }
 
-  async importWallet(privateKey: string): Promise<SniperooWallet> {
+  async importWallet(_privateKey: string): Promise<SniperooWallet> {
     throw new Error('Sniperoo integration not implemented yet (Phase 2)');
   }
 
-  async getWallet(walletId: string): Promise<SniperooWallet> {
+  async getWallet(_walletId: string): Promise<SniperooWallet> {
     throw new Error('Sniperoo integration not implemented yet (Phase 2)');
   }
 
-  async buy(params: SniperooTradeParams): Promise<SniperooTradeResponse> {
+  async buy(_params: SniperooTradeParams): Promise<SniperooTradeResponse> {
     throw new Error('Sniperoo integration not implemented yet (Phase 2)');
   }
 
-  async sell(params: SniperooTradeParams): Promise<SniperooTradeResponse> {
+  async sell(_params: SniperooTradeParams): Promise<SniperooTradeResponse> {
     throw new Error('Sniperoo integration not implemented yet (Phase 2)');
   }
 }

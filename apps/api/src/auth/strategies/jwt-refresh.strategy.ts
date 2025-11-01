@@ -3,6 +3,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
+import { Request } from 'express';
+
+interface JwtPayload {
+  sub: string;
+  email: string;
+}
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
@@ -18,8 +24,8 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     });
   }
 
-  async validate(req: any, payload: any) {
-    const refreshToken = req.body.refreshToken;
+  async validate(req: Request, payload: JwtPayload) {
+    const refreshToken = (req.body as { refreshToken?: string }).refreshToken;
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
     });

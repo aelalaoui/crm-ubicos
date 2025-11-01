@@ -71,7 +71,11 @@ export class UsersService {
       }
     }
 
-    const data: any = {};
+    const data: {
+      email?: string;
+      fullName?: string;
+      passwordHash?: string;
+    } = {};
 
     if (updateUserDto.email) {
       data.email = updateUserDto.email;

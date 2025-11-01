@@ -9,12 +9,7 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [
-    PrismaModule,
-    PassportModule,
-    JwtModule.register({}),
-    ConfigModule,
-  ],
+  imports: [PrismaModule, PassportModule, JwtModule.register({}), ConfigModule],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
   exports: [AuthService],
