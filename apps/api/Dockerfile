@@ -2,9 +2,11 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY . ./
+COPY package*.json ./
+COPY apps/api ./apps/api
+COPY packages ./packages
 
-RUN npm install --workspaces
+RUN npm install
 
 RUN npm run prisma:generate
 RUN npm run build:api
@@ -13,7 +15,7 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
-ENV NODE_ENV=production
+ENV NODE_ENV production
 
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/node_modules ./node_modules

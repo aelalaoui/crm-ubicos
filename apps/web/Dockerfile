@@ -1,25 +1,24 @@
 FROM node:18-alpine AS builder
 
-# Build from the repository root context
-WORKDIR /workspace
+WORKDIR /app
 
-# Copy all sources from the repo root (monorepo) and install/build
-COPY . .
-RUN npm install --workspaces
+COPY package*.json ./
+COPY apps/web ./apps/web
+COPY packages ./packages
+
+RUN npm install
+
 RUN npm run build:web
 
 FROM node:18-alpine AS runner
 
-# Run the standalone Next.js server from a clean image
 WORKDIR /app
+
 ENV NODE_ENV production
 
-# Copy the standalone build (contains server.js, package.json and node_modules)
-COPY --from=builder /workspace/apps/web/.next/standalone/ ./
-
-# Copy the .next static files and public assets expected by the standalone server
-COPY --from=builder /workspace/apps/web/.next/static ./.next/static
-COPY --from=builder /workspace/apps/web/public ./public
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
 
 EXPOSE 3000
 
