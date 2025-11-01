@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { WalletsModule } from './wallets/wallets.module';
 import { SniperooModule } from './sniperoo/sniperoo.module';
+import { HealthModule } from './common/health/health.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import jwtConfig from './config/jwt.config';
@@ -27,6 +28,7 @@ import jwtConfig from './config/jwt.config';
     UsersModule,
     WalletsModule,
     SniperooModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
