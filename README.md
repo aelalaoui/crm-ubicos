@@ -274,12 +274,15 @@ Configure these secrets in your GitHub repository (Settings → Secrets and vari
 - `RAILWAY_API_SERVICE` - Your API service ID from Railway
 - `RAILWAY_WEB_SERVICE` - Your Web service ID from Railway
 
+📖 **See [RAILWAY_SECRETS_SETUP.md](./RAILWAY_SECRETS_SETUP.md) for detailed instructions on setting up GitHub secrets.**
+
 Push to `main` or `master` branch to trigger automatic deployment.
 
 ### Detailed Deployment Guides
 
 - 📖 **Full Guide**: [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) - Complete deployment documentation
 - 🚀 **Quick Start**: [RAILWAY_QUICKSTART.md](./RAILWAY_QUICKSTART.md) - Get deployed in 10 minutes
+- 🔐 **Secrets Setup**: [RAILWAY_SECRETS_SETUP.md](./RAILWAY_SECRETS_SETUP.md) - Configure GitHub Actions secrets
 - 🛠️ **Setup Scripts**:
   - Linux/Mac: `bash scripts/railway-setup.sh`
   - Windows: `scripts\railway-setup.bat`
