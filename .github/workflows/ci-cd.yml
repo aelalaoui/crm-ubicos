@@ -71,48 +71,33 @@ jobs:
   deploy-api:
     needs: test
     runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      SVC_ID: ${{ secrets.RAILWAY_API_SERVICE }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
       - name: Deploy API to Railway
         working-directory: ./apps/api
-        run: railway up --service=${{ secrets.RAILWAY_API_SERVICE }}
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: railway up --service=${{ env.SVC_ID }}
 
   deploy-web:
     needs: test
     runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      SVC_ID: ${{ secrets.RAILWAY_WEB_SERVICE }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Login to Railway
-        run: railway login --browserless
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-      - name: Link Railway project
-        run: railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-      - name: Deploy Web to Railway
+      - name: Deploy API to Railway
         working-directory: ./apps/web
-        run: railway up --service=${{ secrets.RAILWAY_WEB_SERVICE }} --environment=${{ secrets.RAILWAY_ENVIROMENT_PROD }} --verbose
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --service=${{ env.SVC_ID }}
