@@ -5,9 +5,9 @@ WORKDIR /app
 COPY package*.json ./
 COPY . ./
 
-RUN npm install
+RUN npm install --workspaces
 
-RUN npm run build --workspace=apps/web
+RUN npm run build:web
 
 FROM node:18-alpine AS runner
 

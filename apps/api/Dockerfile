@@ -5,10 +5,10 @@ WORKDIR /app
 COPY package*.json ./
 COPY . ./
 
-RUN npm install
+RUN npm install --workspaces
 
-RUN npm run prisma:generate --workspace=apps/api
-RUN npm run build --workspace=apps/api
+RUN npm run prisma:generate
+RUN npm run build:api
 
 FROM node:18-alpine AS runner
 
