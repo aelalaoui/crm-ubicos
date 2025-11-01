@@ -6,9 +6,8 @@ COPY . ./
 
 RUN npm install
 
-RUN npm run prisma:generate
-RUN npm run build:api
-RUN npm run build:api
+RUN cd apps/api && npm run prisma:generate
+RUN cd apps/api && npm run build
 
 FROM node:18-alpine AS runner
 
