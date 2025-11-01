@@ -80,6 +80,7 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy API to Railway
+        working-directory: ./apps/api
         run: railway up --service=${{ secrets.RAILWAY_API_SERVICE }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
@@ -96,6 +97,7 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy Web to Railway
+        working-directory: ./apps/web
         run: railway up --service=${{ secrets.RAILWAY_WEB_SERVICE }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
