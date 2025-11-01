@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . ./
 
-RUN npm install --workspaces --include-workspace-root
+RUN npm install
 
 RUN npm run build:web
 
