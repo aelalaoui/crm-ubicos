@@ -72,6 +72,8 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -82,13 +84,13 @@ jobs:
       - name: Deploy API to Railway
         working-directory: ./apps/api
         run: railway up --service=${{ secrets.RAILWAY_API_SERVICE }}
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   deploy-web:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -99,5 +101,3 @@ jobs:
       - name: Deploy Web to Railway
         working-directory: ./apps/web
         run: railway up --service=${{ secrets.RAILWAY_WEB_SERVICE }}
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
