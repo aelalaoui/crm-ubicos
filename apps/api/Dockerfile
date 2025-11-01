@@ -2,14 +2,14 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY . ./
-
 RUN ls -la && echo "=== Checking directory structure ===" && find . -maxdepth 3 -type d
+
+COPY . ./
 
 RUN npm install
 
-RUN cd apps/api && npm run prisma:generate
-RUN cd apps/api && npm run build
+RUN npm run prisma:generate
+RUN npm run build
 
 FROM node:18-alpine AS runner
 

@@ -2,17 +2,13 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY . ./
-
 RUN ls -la && echo "=== Checking directory structure ===" && find . -maxdepth 3 -type d
+
+COPY . ./
 
 RUN npm install
 
-RUN cd apps/web && npm run build
-
-FROM node:18-alpine AS runner
-
-WORKDIR /app
+RUN npm run build
 
 ENV NODE_ENV production
 
