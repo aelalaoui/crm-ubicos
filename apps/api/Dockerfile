@@ -8,7 +8,6 @@ COPY apps/api/package*.json ./apps/api/
 RUN npm ci
 
 COPY apps/api ./apps/api
-COPY apps/api/prisma ./apps/api/prisma
 
 RUN npm run prisma:generate --workspace=apps/api
 RUN npm run build --workspace=apps/api

@@ -3,11 +3,9 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-COPY apps/web/package*.json ./apps/web/
+COPY apps/web ./apps/web
 
 RUN npm ci
-
-COPY apps/web ./apps/web
 
 RUN npm run build --workspace=apps/web
 
