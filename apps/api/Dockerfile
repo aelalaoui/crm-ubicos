@@ -2,10 +2,9 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY apps/api ./apps/api
+COPY . ./
 
-RUN npm install
+RUN npm install --workspaces --include-workspace-root
 
 RUN npm run prisma:generate
 RUN npm run build:api

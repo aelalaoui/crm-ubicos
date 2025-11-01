@@ -2,10 +2,9 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY apps/web ./apps/web
+COPY . ./
 
-RUN npm install
+RUN npm install --workspaces --include-workspace-root
 
 RUN npm run build:web
 
