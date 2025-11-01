@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY . ./
 
-RUN npm ci
+RUN npm install
 
 RUN npm run prisma:generate --workspace=apps/api
 RUN npm run build --workspace=apps/api
