@@ -6,6 +6,13 @@ COPY . ./
 
 RUN npm install
 
+# Récupère les variables d'environnement au build time
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_WS_URL
+
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+
 RUN npm run build
 
 FROM node:18-alpine AS runner
