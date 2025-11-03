@@ -1,46 +1,54 @@
-import { apiClient } from './client';
+import axios, { AxiosInstance } from 'axios';
+import { Wallet, CreateWalletInput, ImportWalletInput, WalletBalance } from '../types/wallet.types';
 
-export interface Wallet {
-  id: string;
-  name: string;
-  publicKey: string;
-  balance: number;
-  isActive: boolean;
-  createdAt: string;
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-export interface CreateWalletData {
-  name: string;
-}
+class WalletAPI {
+  private client: AxiosInstance;
 
-export interface ImportWalletData {
-  name: string;
-  privateKey: string;
-}
+  constructor() {
+    this.client = axios.create({
+      baseURL: `${API_BASE_URL}/wallets`,
+      withCredentials: true,
+    });
 
-export const walletsApi = {
-  getAll: async () => {
-    const response = await apiClient.get<{ data: Wallet[] }>('/wallets');
-    return response.data.data;
-  },
+    this.client.interceptors.request.use((config) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+  }
 
-  getOne: async (id: string) => {
-    const response = await apiClient.get<{ data: Wallet }>(`/wallets/${id}`);
-    return response.data.data;
-  },
-
-  create: async (data: CreateWalletData) => {
-    const response = await apiClient.post<{ data: Wallet }>('/wallets', data);
-    return response.data.data;
-  },
-
-  import: async (data: ImportWalletData) => {
-    const response = await apiClient.post<{ data: Wallet }>('/wallets/import', data);
-    return response.data.data;
-  },
-
-  delete: async (id: string) => {
-    const response = await apiClient.delete(`/wallets/${id}`);
+  async fetchWallets(): Promise<Wallet[]> {
+    const response = await this.client.get<Wallet[]>('/');
     return response.data;
-  },
-};
+  }
+
+  async createWallet(data: CreateWalletInput): Promise<Wallet> {
+    const response = await this.client.post<Wallet>('/', data);
+    return response.data;
+  }
+
+  async importWallet(data: ImportWalletInput): Promise<Wallet> {
+    const response = await this.client.post<Wallet>('/import', data);
+    return response.data;
+  }
+
+  async deleteWallet(id: string): Promise<void> {
+    await this.client.delete(`/${id}`);
+  }
+
+  async getWalletBalance(id: string): Promise<WalletBalance> {
+    const response = await this.client.get<WalletBalance>(`/${id}/balance`);
+    return response.data;
+  }
+
+  async getWallet(id: string): Promise<Wallet> {
+    const response = await this.client.get<Wallet>(`/${id}`);
+    return response.data;
+  }
+}
+
+export const walletAPI = new WalletAPI();

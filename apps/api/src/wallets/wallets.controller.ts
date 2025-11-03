@@ -16,15 +16,15 @@ export class WalletsController {
   @Post()
   @ApiOperation({ summary: 'Create a new wallet' })
   @ApiResponse({ status: 201, description: 'Wallet created successfully' })
-  create(@CurrentUser('id') userId: string, @Body() createWalletDto: CreateWalletDto) {
-    return this.walletsService.create(userId, createWalletDto);
+  create(@CurrentUser('id') userId: string, @CurrentUser('password') password: string, @Body() createWalletDto: CreateWalletDto) {
+    return this.walletsService.create(userId, createWalletDto, password);
   }
 
   @Post('import')
   @ApiOperation({ summary: 'Import an existing wallet' })
   @ApiResponse({ status: 201, description: 'Wallet imported successfully' })
-  import(@CurrentUser('id') userId: string, @Body() importWalletDto: ImportWalletDto) {
-    return this.walletsService.import(userId, importWalletDto);
+  import(@CurrentUser('id') userId: string, @CurrentUser('password') password: string, @Body() importWalletDto: ImportWalletDto) {
+    return this.walletsService.import(userId, importWalletDto, password);
   }
 
   @Get()
@@ -42,11 +42,19 @@ export class WalletsController {
     return this.walletsService.findOne(id, userId);
   }
 
+  @Get(':id/balance')
+  @ApiOperation({ summary: 'Get wallet balance' })
+  @ApiResponse({ status: 200, description: 'Balance retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Wallet not found' })
+  getBalance(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    return this.walletsService.getBalance(id, userId);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Delete wallet' })
   @ApiResponse({ status: 200, description: 'Wallet deleted successfully' })
   @ApiResponse({ status: 404, description: 'Wallet not found' })
   remove(@Param('id') id: string, @CurrentUser('id') userId: string) {
-    return this.walletsService.remove(id, userId);
+    return this.walletsService.delete(id, userId);
   }
 }
