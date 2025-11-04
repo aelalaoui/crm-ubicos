@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . ./
 
-RUN npm install
+RUN npm install --workspaces --include-workspace-root
 
 # Récupère les variables d'environnement au build time
 ARG NEXT_PUBLIC_API_URL
@@ -13,7 +13,7 @@ ARG NEXT_PUBLIC_WS_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
 
-RUN npm run build
+RUN npm run build --workspace=apps/web
 
 FROM node:18-alpine AS runner
 

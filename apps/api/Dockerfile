@@ -4,18 +4,11 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Copier les fichiers de configuration du monorepo depuis la racine
-COPY package*.json ./
-COPY .npmrc* ./
+# Copier tout le contexte de build (racine du monorepo)
+COPY . ./
 
-# Copier les packages partagés (types)
-COPY packages/ ./packages/
-
-# Copier tout le répertoire apps pour accéder aux autres apps si nécessaire
-COPY apps/ ./apps/
-
-# Installer les dépendances pour tout le monorepo
-RUN npm install
+# Installer les dépendances pour tout le monorepo et les workspaces
+RUN npm install --workspaces --include-workspace-root
 
 # Générer Prisma pour l'API
 RUN npm run prisma:generate --workspace=apps/api
