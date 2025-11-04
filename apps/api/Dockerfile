@@ -4,8 +4,13 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Copier tout le contexte de build (racine du monorepo)
-COPY . ./
+# Copier les fichiers racine du monorepo
+COPY package*.json ./
+COPY .npmrc* ./
+
+# Copier les packages et apps
+COPY packages/ ./packages/
+COPY apps/api/ ./apps/api/
 
 # Installer les dépendances pour tout le monorepo et les workspaces
 RUN npm install --workspaces --include-workspace-root
@@ -33,3 +38,4 @@ COPY --from=builder /app/apps/api/prisma ./prisma
 EXPOSE 3001
 
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+

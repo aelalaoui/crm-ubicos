@@ -2,7 +2,13 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY . ./
+# Copier les fichiers racine du monorepo
+COPY package*.json ./
+COPY .npmrc* ./
+
+# Copier les packages et apps
+COPY packages/ ./packages/
+COPY apps/web/ ./apps/web/
 
 RUN npm install --workspaces --include-workspace-root
 
