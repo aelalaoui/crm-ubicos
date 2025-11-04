@@ -1,4 +1,5 @@
-import { apiClient } from './client';
+﻿import { apiClient } from './client';
+import { AxiosError } from 'axios';
 
 export interface RegisterData {
   email: string;
@@ -27,17 +28,18 @@ export const authApi = {
     try {
       console.log('Registering with:', data);
       console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
-      
+
       const response = await apiClient.post<{ data: AuthResponse }>('/auth/register', data);
-      
+
       console.log('Register response:', response.data);
       return response.data.data;
-    } catch (error: any) {
+    } catch (error: AxiosError | unknown) {
+      const axiosError = error as AxiosError;
       console.error('Register error:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-        url: error.config?.url,
+        message: axiosError.message,
+        status: axiosError.response?.status,
+        data: axiosError.response?.data,
+        url: axiosError.config?.url,
       });
       throw error;
     }
@@ -46,16 +48,17 @@ export const authApi = {
   login: async (data: LoginData) => {
     try {
       console.log('Logging in with:', data);
-      
+
       const response = await apiClient.post<{ data: AuthResponse }>('/auth/login', data);
-      
+
       console.log('Login response:', response.data);
       return response.data.data;
-    } catch (error: any) {
+    } catch (error: AxiosError | unknown) {
+      const axiosError = error as AxiosError;
       console.error('Login error:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
+        message: axiosError.message,
+        status: axiosError.response?.status,
+        data: axiosError.response?.data,
       });
       throw error;
     }
@@ -65,8 +68,9 @@ export const authApi = {
     try {
       const response = await apiClient.post('/auth/logout');
       return response.data;
-    } catch (error: any) {
-      console.error('Logout error:', error);
+    } catch (error: AxiosError | unknown) {
+      const axiosError = error as AxiosError;
+      console.error('Logout error:', axiosError);
       throw error;
     }
   },
@@ -75,9 +79,11 @@ export const authApi = {
     try {
       const response = await apiClient.post('/auth/refresh', { refreshToken });
       return response.data.data;
-    } catch (error: any) {
-      console.error('Refresh token error:', error);
+    } catch (error: AxiosError | unknown) {
+      const axiosError = error as AxiosError;
+      console.error('Refresh token error:', axiosError);
       throw error;
     }
   },
 };
+

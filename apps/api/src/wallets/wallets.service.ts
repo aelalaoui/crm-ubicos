@@ -22,7 +22,14 @@ export class WalletsService {
     encrypted += cipher.final('hex');
 
     const authTag = cipher.getAuthTag();
-    const combined = salt.toString('hex') + ':' + iv.toString('hex') + ':' + authTag.toString('hex') + ':' + encrypted;
+    const combined =
+      salt.toString('hex') +
+      ':' +
+      iv.toString('hex') +
+      ':' +
+      authTag.toString('hex') +
+      ':' +
+      encrypted;
 
     return combined;
   }

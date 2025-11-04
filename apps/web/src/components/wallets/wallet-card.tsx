@@ -40,11 +40,7 @@ export function WalletCard({ wallet, onDelete, isDeleting }: WalletCardProps) {
             <code className="text-sm bg-gray-100 px-2 py-1 rounded">
               {truncateAddress(wallet.publicKey)}
             </code>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => copyToClipboard(wallet.publicKey)}
-            >
+            <Button size="sm" variant="ghost" onClick={() => copyToClipboard(wallet.publicKey)}>
               <Copy className="w-4 h-4" />
             </Button>
           </div>

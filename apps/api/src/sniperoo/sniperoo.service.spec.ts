@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 
 describe('SniperooService', () => {
   let service: SniperooService;
-  let configService: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

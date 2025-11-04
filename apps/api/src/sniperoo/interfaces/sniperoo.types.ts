@@ -70,7 +70,12 @@ export interface SniperooListOrdersResponse {
 }
 
 export interface SniperooWebSocketEvent {
-  type: 'position:created' | 'position:updated' | 'position:closed' | 'order:executed' | 'order:failed';
+  type:
+    | 'position:created'
+    | 'position:updated'
+    | 'position:closed'
+    | 'order:executed'
+    | 'order:failed';
   data: SniperooPosition | SniperooOrder;
   timestamp: string;
 }

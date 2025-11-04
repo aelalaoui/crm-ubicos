@@ -60,9 +60,7 @@ export function CreateWalletDialog({ open, onOpenChange }: CreateWalletDialogPro
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Wallet</DialogTitle>
-          <DialogDescription>
-            Create a new Solana wallet for trading
-          </DialogDescription>
+          <DialogDescription>Create a new Solana wallet for trading</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

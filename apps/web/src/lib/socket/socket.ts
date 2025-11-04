@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { SniperooPositionDTO, SniperooOrderDTO } from '@solana-trading-crm/types';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -77,61 +78,61 @@ class SocketService {
     }
   }
 
-  onPositionCreated(callback: (position: any) => void): void {
+  onPositionCreated(callback: (position: SniperooPositionDTO) => void): void {
     if (this.socket) {
       this.socket.on('position:created', callback);
     }
   }
 
-  onPositionUpdated(callback: (position: any) => void): void {
+  onPositionUpdated(callback: (position: SniperooPositionDTO) => void): void {
     if (this.socket) {
       this.socket.on('position:updated', callback);
     }
   }
 
-  onPositionClosed(callback: (position: any) => void): void {
+  onPositionClosed(callback: (position: SniperooPositionDTO) => void): void {
     if (this.socket) {
       this.socket.on('position:closed', callback);
     }
   }
 
-  onOrderExecuted(callback: (order: any) => void): void {
+  onOrderExecuted(callback: (order: SniperooOrderDTO) => void): void {
     if (this.socket) {
       this.socket.on('order:executed', callback);
     }
   }
 
-  onOrderFailed(callback: (order: any) => void): void {
+  onOrderFailed(callback: (order: SniperooOrderDTO) => void): void {
     if (this.socket) {
       this.socket.on('order:failed', callback);
     }
   }
 
-  offPositionCreated(callback: (position: any) => void): void {
+  offPositionCreated(callback: (position: SniperooPositionDTO) => void): void {
     if (this.socket) {
       this.socket.off('position:created', callback);
     }
   }
 
-  offPositionUpdated(callback: (position: any) => void): void {
+  offPositionUpdated(callback: (position: SniperooPositionDTO) => void): void {
     if (this.socket) {
       this.socket.off('position:updated', callback);
     }
   }
 
-  offPositionClosed(callback: (position: any) => void): void {
+  offPositionClosed(callback: (position: SniperooPositionDTO) => void): void {
     if (this.socket) {
       this.socket.off('position:closed', callback);
     }
   }
 
-  offOrderExecuted(callback: (order: any) => void): void {
+  offOrderExecuted(callback: (order: SniperooOrderDTO) => void): void {
     if (this.socket) {
       this.socket.off('order:executed', callback);
     }
   }
 
-  offOrderFailed(callback: (order: any) => void): void {
+  offOrderFailed(callback: (order: SniperooOrderDTO) => void): void {
     if (this.socket) {
       this.socket.off('order:failed', callback);
     }

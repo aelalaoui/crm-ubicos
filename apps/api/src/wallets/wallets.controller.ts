@@ -16,14 +16,22 @@ export class WalletsController {
   @Post()
   @ApiOperation({ summary: 'Create a new wallet' })
   @ApiResponse({ status: 201, description: 'Wallet created successfully' })
-  create(@CurrentUser('id') userId: string, @CurrentUser('password') password: string, @Body() createWalletDto: CreateWalletDto) {
+  create(
+    @CurrentUser('id') userId: string,
+    @CurrentUser('password') password: string,
+    @Body() createWalletDto: CreateWalletDto,
+  ) {
     return this.walletsService.create(userId, createWalletDto, password);
   }
 
   @Post('import')
   @ApiOperation({ summary: 'Import an existing wallet' })
   @ApiResponse({ status: 201, description: 'Wallet imported successfully' })
-  import(@CurrentUser('id') userId: string, @CurrentUser('password') password: string, @Body() importWalletDto: ImportWalletDto) {
+  import(
+    @CurrentUser('id') userId: string,
+    @CurrentUser('password') password: string,
+    @Body() importWalletDto: ImportWalletDto,
+  ) {
     return this.walletsService.import(userId, importWalletDto, password);
   }
 

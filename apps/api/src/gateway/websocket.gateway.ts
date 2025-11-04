@@ -1,9 +1,18 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, MessageBody } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  ConnectedSocket,
+  MessageBody,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SniperooService } from '../sniperoo/sniperoo.service';
+import { SniperooPositionDTO, SniperooOrderDTO } from '@solana-trading-crm/types';
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -29,7 +38,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private configService: ConfigService,
     private sniperooService: SniperooService,
   ) {
-    this.sniperooWebSocketUrl = this.configService.get<string>('SNIPEROO_WS_URL') || 'wss://ws.sniperoo.app';
+    this.sniperooWebSocketUrl =
+      this.configService.get<string>('SNIPEROO_WS_URL') || 'wss://ws.sniperoo.app';
   }
 
   async handleConnection(client: AuthenticatedSocket) {
@@ -132,24 +142,23 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { success: true };
   }
 
-  emitPositionCreated(userId: string, position: any) {
+  emitPositionCreated(userId: string, position: SniperooPositionDTO): void {
     this.server.to(`user:${userId}`).emit('position:created', position);
   }
 
-  emitPositionUpdated(userId: string, position: any) {
+  emitPositionUpdated(userId: string, position: SniperooPositionDTO): void {
     this.server.to(`user:${userId}`).emit('position:updated', position);
   }
 
-  emitPositionClosed(userId: string, position: any) {
+  emitPositionClosed(userId: string, position: SniperooPositionDTO): void {
     this.server.to(`user:${userId}`).emit('position:closed', position);
   }
 
-  emitOrderExecuted(userId: string, order: any) {
+  emitOrderExecuted(userId: string, order: SniperooOrderDTO): void {
     this.server.to(`user:${userId}`).emit('order:executed', order);
   }
 
-  emitOrderFailed(userId: string, order: any) {
+  emitOrderFailed(userId: string, order: SniperooOrderDTO): void {
     this.server.to(`user:${userId}`).emit('order:failed', order);
   }
 }
-

@@ -55,11 +55,7 @@ export default function WalletDetailPage() {
               <code className="text-sm bg-gray-100 px-3 py-2 rounded flex-1 break-all">
                 {wallet.publicKey}
               </code>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => copyToClipboard(wallet.publicKey)}
-              >
+              <Button size="sm" variant="ghost" onClick={() => copyToClipboard(wallet.publicKey)}>
                 <Copy className="w-4 h-4" />
               </Button>
             </div>
@@ -72,7 +68,9 @@ export default function WalletDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">
-              {balanceLoading ? 'Loading...' : `${(balanceData?.balance || wallet.balance).toFixed(4)} SOL`}
+              {balanceLoading
+                ? 'Loading...'
+                : `${(balanceData?.balance || wallet.balance).toFixed(4)} SOL`}
             </div>
           </CardContent>
         </Card>
