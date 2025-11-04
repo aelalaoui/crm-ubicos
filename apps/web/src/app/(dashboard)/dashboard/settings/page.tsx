@@ -1,18 +1,29 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth-store';
 import { useRouter } from 'next/navigation';
-import { Settings, Bell, Lock, Database } from 'lucide-react';
+import { Bell, Lock, Database } from 'lucide-react';
 
 export default function SettingsPage() {
   const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const router = useRouter();
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
   if (!user) {
-    router.push('/login');
-    return null;
+    return (
+      <div className="container mx-auto p-6 flex items-center justify-center min-h-screen">
+        <div>Loading...</div>
+      </div>
+    );
   }
 
   return (
