@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-type ToastActionElement = React.ReactElement<any>;
+type ToastActionElement = React.ReactElement<Record<string, unknown>>;
 
 interface Toast {
   open?: boolean;
