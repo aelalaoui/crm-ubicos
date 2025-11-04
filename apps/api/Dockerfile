@@ -4,22 +4,31 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Copier les fichiers racine du monorepo
+# Copier les fichiers du package local
 COPY package*.json ./
 COPY .npmrc* ./
+COPY tsconfig.json ./
+COPY tsconfig.build.json ./
+COPY nest-cli.json ./
 
-# Copier les packages et apps
-COPY packages/ ./packages/
-COPY apps/api/ ./apps/api/
+# Copier le code source
+COPY src/ ./src/
+COPY prisma/ ./prisma/
 
-# Installer les dépendances pour tout le monorepo et les workspaces
-RUN npm install --workspaces --include-workspace-root
+# Créer un répertoire pour le package local manquant
+RUN mkdir -p node_modules/@solana-trading-crm/types && \
+    echo '{"name":"@solana-trading-crm/types","version":"1.0.0"}' > node_modules/@solana-trading-crm/types/package.json && \
+    mkdir -p node_modules/@solana-trading-crm/types/src && \
+    echo 'export interface SniperooPositionDTO {} export interface SniperooOrderDTO {}' > node_modules/@solana-trading-crm/types/src/index.ts
 
-# Générer Prisma pour l'API
-RUN npm run prisma:generate --workspace=apps/api
+# Installer les dépendances
+RUN npm install --legacy-peer-deps
 
-# Builder l'app API
-RUN npm run build --workspace=apps/api
+# Générer Prisma
+RUN npm run prisma:generate
+
+# Builder l'app
+RUN npm run build
 
 FROM node:18-alpine AS runner
 
@@ -30,10 +39,10 @@ WORKDIR /app
 ENV NODE_ENV production
 
 # Copier les fichiers compilés depuis le builder
-COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3001
 
