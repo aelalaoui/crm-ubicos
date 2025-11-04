@@ -35,11 +35,11 @@ export interface SniperooOrderDTO {
   executedAt?: string;
 }
 
-export type WebSocketEventType = 
-  | 'position:created' 
-  | 'position:updated' 
-  | 'position:closed' 
-  | 'order:executed' 
+export type WebSocketEventType =
+  | 'position:created'
+  | 'position:updated'
+  | 'position:closed'
+  | 'order:executed'
   | 'order:failed';
 
 export interface WebSocketEventDTO {
