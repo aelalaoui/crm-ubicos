@@ -58,11 +58,15 @@ describe('WalletsService', () => {
 
       const mockDbWallet = {
         id: 'wallet-123',
+        userId: 'user-123',
         name: 'Test Wallet',
         publicKey: 'public-key',
+        encryptedPrivateKey: 'encrypted-key',
         balance: 0,
         isActive: true,
+        sniperooWalletId: 'sniperoo-123',
         createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       jest.spyOn(sniperooService, 'createWallet').mockResolvedValueOnce(mockSniperooWallet);
@@ -81,11 +85,15 @@ describe('WalletsService', () => {
       const mockWallets = [
         {
           id: 'wallet-1',
+          userId: 'user-123',
           name: 'Wallet 1',
           publicKey: 'key-1',
+          encryptedPrivateKey: 'encrypted-key-1',
           balance: 1.0,
           isActive: true,
+          sniperooWalletId: 'sniperoo-1',
           createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ];
 
@@ -106,8 +114,15 @@ describe('WalletsService', () => {
     it('should get wallet balance from Sniperoo', async () => {
       const mockWallet = {
         id: 'wallet-123',
+        userId: 'user-123',
+        name: 'Wallet',
+        publicKey: 'public-key',
+        encryptedPrivateKey: 'encrypted-key',
         sniperooWalletId: 'sniperoo-123',
         balance: 1.0,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       jest.spyOn(prismaService.wallet, 'findFirst').mockResolvedValueOnce(mockWallet);
@@ -128,7 +143,15 @@ describe('WalletsService', () => {
     it('should delete wallet and call Sniperoo', async () => {
       const mockWallet = {
         id: 'wallet-123',
+        userId: 'user-123',
+        name: 'Wallet',
+        publicKey: 'public-key',
+        encryptedPrivateKey: 'encrypted-key',
         sniperooWalletId: 'sniperoo-123',
+        balance: 1.0,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       jest.spyOn(prismaService.wallet, 'findFirst').mockResolvedValueOnce(mockWallet);

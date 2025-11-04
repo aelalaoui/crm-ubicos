@@ -13,7 +13,7 @@ describe('SniperooService', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) => {
-              const config = {
+              const config: Record<string, string> = {
                 SNIPEROO_API_URL: 'https://api.sniperoo.app',
                 SNIPEROO_API_KEY: 'test-key',
               };
@@ -25,7 +25,6 @@ describe('SniperooService', () => {
     }).compile();
 
     service = module.get<SniperooService>(SniperooService);
-    configService = module.get<ConfigService>(ConfigService);
   });
 
   it('should be defined', () => {
