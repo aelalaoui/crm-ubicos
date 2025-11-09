@@ -106,11 +106,47 @@ export class SniperooService {
 
   async createWallet(name: string): Promise<SniperooCreateWalletResponse> {
     return this.retryRequest(async () => {
-      const response = await this.client.post<SniperooCreateWalletResponse>('/user/wallets', {
-        name,
-      });
-      this.logger.log(`Wallet created: ${response.data.wallet.id}`);
-      return response.data;
+      try {
+        const response = await this.client.post<any>('/user/wallets', {
+          name,
+        });
+        this.logger.log(`Wallet API Response:`, JSON.stringify(response.data));
+
+        // Handle different response formats
+        let walletData = response.data;
+        if (response.data.data) {
+          walletData = response.data.data;
+        }
+
+        // If wallet is nested under 'wallet' property
+        if (walletData.wallet) {
+          this.logger.log(`Wallet created: ${walletData.wallet.id}`);
+          return {
+            wallet: walletData.wallet,
+            privateKey: walletData.privateKey,
+          };
+        }
+
+        // If response is already in the right format
+        if (walletData.id && walletData.privateKey) {
+          this.logger.log(`Wallet created: ${walletData.id}`);
+          return {
+            wallet: walletData,
+            privateKey: walletData.privateKey,
+          };
+        }
+
+        throw new Error(`Unexpected response format: ${JSON.stringify(response.data)}`);
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        this.logger.error(
+          `createWallet request failed: ${axiosError.message}`,
+        );
+        if (axiosError.response?.data) {
+          this.logger.error(`Response data:`, JSON.stringify(axiosError.response.data));
+        }
+        throw error;
+      }
     }, 'createWallet');
   }
 

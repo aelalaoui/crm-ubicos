@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { SniperooService } from '../sniperoo/sniperoo.service';
 import { CreateWalletDto } from './dto/create-wallet.dto';
@@ -10,11 +11,17 @@ export class WalletsService {
   constructor(
     private prisma: PrismaService,
     private sniperooService: SniperooService,
+    private configService: ConfigService,
   ) {}
 
-  private encryptPrivateKey(privateKey: string, password: string): string {
+  private generateEncryptionKey(userId: string): string {
+    const secret = this.configService.get<string>('JWT_SECRET') || 'default-secret';
+    return crypto.createHash('sha256').update(`${userId}:${secret}`).digest('hex');
+  }
+
+  private encryptPrivateKey(privateKey: string, encryptionKey: string): string {
     const salt = crypto.randomBytes(16);
-    const key = crypto.pbkdf2Sync(password, salt, 100000, 32, 'sha256');
+    const key = crypto.pbkdf2Sync(encryptionKey, salt, 100000, 32, 'sha256');
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
 
@@ -34,14 +41,14 @@ export class WalletsService {
     return combined;
   }
 
-  private decryptPrivateKey(encryptedData: string, password: string): string {
+  private decryptPrivateKey(encryptedData: string, encryptionKey: string): string {
     const parts = encryptedData.split(':');
     const salt = Buffer.from(parts[0], 'hex');
     const iv = Buffer.from(parts[1], 'hex');
     const authTag = Buffer.from(parts[2], 'hex');
     const encrypted = parts[3];
 
-    const key = crypto.pbkdf2Sync(password, salt, 100000, 32, 'sha256');
+    const key = crypto.pbkdf2Sync(encryptionKey, salt, 100000, 32, 'sha256');
     const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
     decipher.setAuthTag(authTag);
 
@@ -51,10 +58,11 @@ export class WalletsService {
     return decrypted;
   }
 
-  async create(userId: string, createWalletDto: CreateWalletDto, userPassword: string) {
+  async create(userId: string, createWalletDto: CreateWalletDto) {
     const sniperooWallet = await this.sniperooService.createWallet(createWalletDto.name);
 
-    const encryptedKey = this.encryptPrivateKey(sniperooWallet.privateKey, userPassword);
+    const encryptionKey = this.generateEncryptionKey(userId);
+    const encryptedKey = this.encryptPrivateKey(sniperooWallet.privateKey, encryptionKey);
 
     const wallet = await this.prisma.wallet.create({
       data: {
@@ -78,13 +86,14 @@ export class WalletsService {
     return wallet;
   }
 
-  async import(userId: string, importWalletDto: ImportWalletDto, userPassword: string) {
+  async import(userId: string, importWalletDto: ImportWalletDto) {
     const sniperooWallet = await this.sniperooService.importWallet(
       importWalletDto.name,
       importWalletDto.privateKey,
     );
 
-    const encryptedKey = this.encryptPrivateKey(importWalletDto.privateKey, userPassword);
+    const encryptionKey = this.generateEncryptionKey(userId);
+    const encryptedKey = this.encryptPrivateKey(importWalletDto.privateKey, encryptionKey);
 
     const wallet = await this.prisma.wallet.create({
       data: {

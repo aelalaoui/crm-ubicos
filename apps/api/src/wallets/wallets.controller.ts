@@ -18,10 +18,9 @@ export class WalletsController {
   @ApiResponse({ status: 201, description: 'Wallet created successfully' })
   create(
     @CurrentUser('id') userId: string,
-    @CurrentUser('password') password: string,
     @Body() createWalletDto: CreateWalletDto,
   ) {
-    return this.walletsService.create(userId, createWalletDto, password);
+    return this.walletsService.create(userId, createWalletDto);
   }
 
   @Post('import')
@@ -29,10 +28,9 @@ export class WalletsController {
   @ApiResponse({ status: 201, description: 'Wallet imported successfully' })
   import(
     @CurrentUser('id') userId: string,
-    @CurrentUser('password') password: string,
     @Body() importWalletDto: ImportWalletDto,
   ) {
-    return this.walletsService.import(userId, importWalletDto, password);
+    return this.walletsService.import(userId, importWalletDto);
   }
 
   @Get()
