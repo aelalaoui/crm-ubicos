@@ -11,7 +11,21 @@ import { Plus, Download } from 'lucide-react';
 export default function WalletsPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const { data: wallets = [], isLoading } = useWallets();
+  const { data: wallets = [], isLoading, error } = useWallets();
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Wallets</h1>
+          <p className="text-gray-500 mt-1">Manage your Solana wallets</p>
+        </div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Error loading wallets. Please try again.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -32,7 +46,7 @@ export default function WalletsPage() {
         </div>
       </div>
 
-      <WalletList wallets={wallets} isLoading={isLoading} />
+      <WalletList wallets={Array.isArray(wallets) ? wallets : []} isLoading={isLoading} />
 
       <CreateWalletDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
       <ImportWalletDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />

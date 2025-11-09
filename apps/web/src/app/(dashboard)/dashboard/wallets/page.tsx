@@ -47,9 +47,11 @@ export default function WalletsPage() {
       try {
         setIsLoadingWallets(true);
         const fetchedWallets = await walletAPI.fetchWallets();
-        setWallets(fetchedWallets);
+        // Ensure wallets is always an array
+        setWallets(Array.isArray(fetchedWallets) ? fetchedWallets : []);
       } catch (err) {
         console.error('Error fetching wallets:', err);
+        setWallets([]);
       } finally {
         setIsLoadingWallets(false);
       }

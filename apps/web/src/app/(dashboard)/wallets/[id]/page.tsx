@@ -10,7 +10,21 @@ import { useToast } from '@/components/ui/use-toast';
 
 export default function WalletDetailPage() {
   const params = useParams();
-  const walletId = params.id as string;
+  const walletId = Array.isArray(params.id) ? params.id[0] : (params.id as string);
+
+  if (!walletId) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-center py-12">
+          <p className="text-red-500 mb-4">Invalid wallet ID</p>
+          <Link href="/dashboard/wallets">
+            <Button>Back to Wallets</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet(walletId);
   const { data: balanceData, isLoading: balanceLoading } = useWalletBalance(walletId);
   const { toast } = useToast();

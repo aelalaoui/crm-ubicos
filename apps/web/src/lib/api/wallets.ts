@@ -22,8 +22,31 @@ class WalletAPI {
   }
 
   async fetchWallets(): Promise<Wallet[]> {
-    const response = await this.client.get<Wallet[]>('/');
-    return response.data;
+    try {
+      const response = await this.client.get<Wallet[] | { wallets: Wallet[] } | any>('/');
+
+      // Handle different response formats
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+
+      // If wrapped in a wallets property
+      if (response.data && Array.isArray(response.data.wallets)) {
+        return response.data.wallets;
+      }
+
+      // If wrapped in a data property
+      if (response.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      }
+
+      // Fallback to empty array if not found
+      console.warn('Unexpected wallet response format:', response.data);
+      return [];
+    } catch (error) {
+      console.error('Error fetching wallets:', error);
+      return [];
+    }
   }
 
   async createWallet(data: CreateWalletInput): Promise<Wallet> {
