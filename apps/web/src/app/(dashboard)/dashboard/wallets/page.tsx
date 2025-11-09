@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { walletAPI } from '@/lib/api/wallets';
 
 interface WalletItem {
   id: string;
@@ -59,25 +60,9 @@ export default function WalletsPage() {
     setError(null);
 
     try {
-      const accessToken = useAuthStore.getState().accessToken; // Get token from auth store
-
-      const response = await fetch('/api/wallets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          name: walletName,
-        }),
+      const newWallet = await walletAPI.createWallet({
+        name: walletName,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create wallet');
-      }
-
-      const newWallet = await response.json();
 
       // Add the new wallet to the list
       setWallets([

@@ -1,19 +1,19 @@
 import axios, { AxiosInstance } from 'axios';
 import { Wallet, CreateWalletInput, ImportWalletInput, WalletBalance } from '../types/wallet.types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 class WalletAPI {
   private client: AxiosInstance;
 
   constructor() {
     this.client = axios.create({
-      baseURL: `${API_BASE_URL}/wallets`,
+      baseURL: `${API_BASE_URL}/api/wallets`,
       withCredentials: true,
     });
 
     this.client.interceptors.request.use((config) => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
