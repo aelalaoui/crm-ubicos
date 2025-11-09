@@ -21,9 +21,8 @@ import { walletAPI } from '@/lib/api/wallets';
 interface WalletItem {
   id: string;
   name: string;
-  address: string;
+  publicKey: string;
   balance: number;
-  currency: string;
 }
 
 export default function WalletsPage() {
@@ -35,12 +34,31 @@ export default function WalletsPage() {
   const [walletName, setWalletName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingWallets, setIsLoadingWallets] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    const loadWallets = async () => {
+      try {
+        setIsLoadingWallets(true);
+        const fetchedWallets = await walletAPI.fetchWallets();
+        setWallets(fetchedWallets);
+      } catch (err) {
+        console.error('Error fetching wallets:', err);
+      } finally {
+        setIsLoadingWallets(false);
+      }
+    };
+
+    if (isAuthenticated && user) {
+      loadWallets();
+    }
+  }, [isAuthenticated, user]);
 
   if (!user) {
     return (
@@ -70,9 +88,8 @@ export default function WalletsPage() {
         {
           id: newWallet.id,
           name: newWallet.name,
-          address: newWallet.publicKey,
+          publicKey: newWallet.publicKey,
           balance: newWallet.balance,
-          currency: 'SOL',
         },
       ]);
 
@@ -87,13 +104,26 @@ export default function WalletsPage() {
     }
   };
 
-  const handleDeleteWallet = (id: string) => {
-    setWallets(wallets.filter((w) => w.id !== id));
+  const handleDeleteWallet = async (id: string) => {
+    try {
+      await walletAPI.deleteWallet(id);
+      setWallets(wallets.filter((w) => w.id !== id));
+    } catch (err) {
+      console.error('Error deleting wallet:', err);
+    }
   };
 
   const handleCopyAddress = (address: string) => {
     navigator.clipboard.writeText(address);
   };
+
+  if (isLoadingWallets) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-center py-12">Loading wallets...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -126,7 +156,11 @@ export default function WalletsPage() {
               </div>
               {error && <div className="text-sm text-red-500">{error}</div>}
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isLoading}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                  disabled={isLoading}
+                >
                   Cancel
                 </Button>
                 <Button onClick={handleAddWallet} disabled={isLoading}>
@@ -170,7 +204,11 @@ export default function WalletsPage() {
                   </div>
                   {error && <div className="text-sm text-red-500">{error}</div>}
                   <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isLoading}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                      disabled={isLoading}
+                    >
                       Cancel
                     </Button>
                     <Button onClick={handleAddWallet} disabled={isLoading}>
@@ -189,17 +227,23 @@ export default function WalletsPage() {
               <CardHeader className="flex flex-row items-center justify-between pb-3">
                 <div>
                   <CardTitle>{wallet.name}</CardTitle>
-                  <CardDescription className="font-mono text-xs">{wallet.address}</CardDescription>
+                  <CardDescription className="font-mono text-xs">
+                    {wallet.publicKey}
+                  </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleCopyAddress(wallet.address)}
+                    onClick={() => handleCopyAddress(wallet.publicKey)}
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteWallet(wallet.id)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteWallet(wallet.id)}
+                  >
                     <Trash2 className="w-4 h-4 text-red-500" />
                   </Button>
                 </div>
@@ -208,9 +252,7 @@ export default function WalletsPage() {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm text-muted-foreground">Balance</p>
-                    <p className="text-2xl font-bold">
-                      {wallet.balance} {wallet.currency}
-                    </p>
+                    <p className="text-2xl font-bold">{wallet.balance.toFixed(4)} SOL</p>
                   </div>
                 </div>
               </CardContent>

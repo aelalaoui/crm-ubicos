@@ -11,7 +11,7 @@ import { useToast } from '@/components/ui/use-toast';
 export default function WalletDetailPage() {
   const params = useParams();
   const walletId = params.id as string;
-  const { data: wallet, isLoading: walletLoading } = useWallet(walletId);
+  const { data: wallet, isLoading: walletLoading, error: walletError } = useWallet(walletId);
   const { data: balanceData, isLoading: balanceLoading } = useWalletBalance(walletId);
   const { toast } = useToast();
 
@@ -24,15 +24,28 @@ export default function WalletDetailPage() {
   };
 
   if (walletLoading) {
-    return <div className="text-center py-12">Loading wallet...</div>;
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-center py-12">Loading wallet...</div>
+      </div>
+    );
   }
 
-  if (!wallet) {
-    return <div className="text-center py-12">Wallet not found</div>;
+  if (walletError || !wallet) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-center py-12">
+          <p className="text-red-500 mb-4">Failed to load wallet</p>
+          <Link href="/dashboard/wallets">
+            <Button>Back to Wallets</Button>
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
       <Link href="/dashboard/wallets">
         <Button variant="ghost" className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -48,14 +61,18 @@ export default function WalletDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Public Key</CardTitle>
+            <CardTitle>Public Key (Address)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <code className="text-sm bg-gray-100 px-3 py-2 rounded flex-1 break-all">
+              <code className="text-sm bg-gray-100 px-3 py-2 rounded flex-1 break-all font-mono">
                 {wallet.publicKey}
               </code>
-              <Button size="sm" variant="ghost" onClick={() => copyToClipboard(wallet.publicKey)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => copyToClipboard(wallet.publicKey)}
+              >
                 <Copy className="w-4 h-4" />
               </Button>
             </div>
@@ -70,7 +87,7 @@ export default function WalletDetailPage() {
             <div className="text-3xl font-bold">
               {balanceLoading
                 ? 'Loading...'
-                : `${(balanceData?.balance || wallet.balance).toFixed(4)} SOL`}
+                : `${(balanceData?.balance || wallet.balance || 0).toFixed(4)} SOL`}
             </div>
           </CardContent>
         </Card>
@@ -82,12 +99,16 @@ export default function WalletDetailPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
+            <p className="text-sm text-gray-500">Wallet ID</p>
+            <p className="text-sm font-mono">{wallet.id}</p>
+          </div>
+          <div>
             <p className="text-sm text-gray-500">Created</p>
             <p className="text-sm">{new Date(wallet.createdAt).toLocaleString()}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Status</p>
-            <p className="text-sm">{wallet.isActive ? 'Active' : 'Inactive'}</p>
+            <p className="text-sm">{wallet.isActive ? '✅ Active' : '❌ Inactive'}</p>
           </div>
         </CardContent>
       </Card>
@@ -98,9 +119,12 @@ export default function WalletDetailPage() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-2">
-            <Button>Buy Token</Button>
-            <Button variant="outline">Sell Token</Button>
+            <Button disabled>Buy Token</Button>
+            <Button variant="outline" disabled>
+              Sell Token
+            </Button>
           </div>
+          <p className="text-sm text-gray-500 mt-2">Trading features coming soon</p>
         </CardContent>
       </Card>
     </div>
