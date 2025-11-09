@@ -7,6 +7,15 @@ import { useAuthStore } from '@/store/auth-store';
 import { useRouter } from 'next/navigation';
 import { Plus, Wallet, Copy, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface WalletItem {
   id: string;
@@ -21,6 +30,10 @@ export default function WalletsPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const router = useRouter();
   const [wallets, setWallets] = useState<WalletItem[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [walletName, setWalletName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -36,9 +49,57 @@ export default function WalletsPage() {
     );
   }
 
-  const handleAddWallet = () => {
-    // TODO: Implement wallet connection dialog
-    console.log('Add wallet');
+  const handleAddWallet = async () => {
+    if (!walletName.trim()) {
+      setError('Wallet name is required');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const accessToken = useAuthStore.getState().accessToken; // Get token from auth store
+
+      const response = await fetch('/api/wallets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          name: walletName,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create wallet');
+      }
+
+      const newWallet = await response.json();
+
+      // Add the new wallet to the list
+      setWallets([
+        ...wallets,
+        {
+          id: newWallet.id,
+          name: newWallet.name,
+          address: newWallet.publicKey,
+          balance: newWallet.balance,
+          currency: 'SOL',
+        },
+      ]);
+
+      // Reset form and close dialog
+      setWalletName('');
+      setIsDialogOpen(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while creating the wallet');
+      console.error('Error creating wallet:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDeleteWallet = (id: string) => {
@@ -56,10 +117,40 @@ export default function WalletsPage() {
           <h1 className="text-3xl font-bold">Wallets</h1>
           <p className="text-muted-foreground">Manage your connected wallets</p>
         </div>
-        <Button onClick={handleAddWallet} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Connect Wallet
-        </Button>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Create Wallet
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Wallet</DialogTitle>
+              <DialogDescription>Create a new Solana wallet for your trading</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Wallet Name</label>
+                <Input
+                  placeholder="e.g., My Trading Wallet"
+                  value={walletName}
+                  onChange={(e) => setWalletName(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+              {error && <div className="text-sm text-red-500">{error}</div>}
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isLoading}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAddWallet} disabled={isLoading}>
+                  {isLoading ? 'Creating...' : 'Create Wallet'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {wallets.length === 0 ? (
@@ -67,13 +158,43 @@ export default function WalletsPage() {
           <CardHeader>
             <Wallet className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
             <CardTitle>No Wallets Connected</CardTitle>
-            <CardDescription>Connect your first wallet to get started</CardDescription>
+            <CardDescription>Create your first wallet to get started</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={handleAddWallet} className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Connect Your First Wallet
-            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  Create Your First Wallet
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Wallet</DialogTitle>
+                  <DialogDescription>Create a new Solana wallet for your trading</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Wallet Name</label>
+                    <Input
+                      placeholder="e.g., My Trading Wallet"
+                      value={walletName}
+                      onChange={(e) => setWalletName(e.target.value)}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  {error && <div className="text-sm text-red-500">{error}</div>}
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isLoading}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddWallet} disabled={isLoading}>
+                      {isLoading ? 'Creating...' : 'Create Wallet'}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
       ) : (
