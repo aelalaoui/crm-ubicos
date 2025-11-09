@@ -112,14 +112,24 @@ export class SniperooService {
         });
         this.logger.log(`Wallet API Response:`, JSON.stringify(response.data));
 
-        // Handle different response formats
-        let walletData = response.data;
-        if (response.data.data) {
-          walletData = response.data.data;
+        const walletData = response.data;
+
+        // Handle Sniperoo actual response format: { id, walletAddress, walletPk, ... }
+        if (walletData.id && walletData.walletAddress && walletData.walletPk) {
+          this.logger.log(`Wallet created: ${walletData.id}`);
+          return {
+            wallet: {
+              id: walletData.id.toString(),
+              publicKey: walletData.walletAddress,
+              balance: 0,
+              createdAt: new Date().toISOString(),
+            },
+            privateKey: walletData.walletPk,
+          };
         }
 
-        // If wallet is nested under 'wallet' property
-        if (walletData.wallet) {
+        // Handle nested wallet format: { wallet: {...}, privateKey: "..." }
+        if (walletData.wallet && walletData.wallet.id) {
           this.logger.log(`Wallet created: ${walletData.wallet.id}`);
           return {
             wallet: walletData.wallet,
@@ -127,11 +137,15 @@ export class SniperooService {
           };
         }
 
-        // If response is already in the right format
+        // Handle flat response with id and privateKey
         if (walletData.id && walletData.privateKey) {
           this.logger.log(`Wallet created: ${walletData.id}`);
           return {
-            wallet: walletData,
+            wallet: {
+              id: walletData.id.toString(),
+              publicKey: walletData.publicKey || walletData.address || '',
+              balance: walletData.balance || 0,
+            },
             privateKey: walletData.privateKey,
           };
         }

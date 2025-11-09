@@ -61,16 +61,14 @@ export class WalletsService {
   async create(userId: string, createWalletDto: CreateWalletDto) {
     const sniperooWallet = await this.sniperooService.createWallet(createWalletDto.name);
 
-    const encryptionKey = this.generateEncryptionKey(userId);
-    const encryptedKey = this.encryptPrivateKey(sniperooWallet.privateKey, encryptionKey);
-
+    // Sniperoo returns walletPk which is already encrypted, store it directly
     const wallet = await this.prisma.wallet.create({
       data: {
         userId,
         sniperooWalletId: sniperooWallet.wallet.id,
         name: createWalletDto.name,
         publicKey: sniperooWallet.wallet.publicKey,
-        encryptedPrivateKey: encryptedKey,
+        encryptedPrivateKey: sniperooWallet.privateKey,
         balance: sniperooWallet.wallet.balance || 0,
       },
       select: {
@@ -92,6 +90,7 @@ export class WalletsService {
       importWalletDto.privateKey,
     );
 
+    // For imported wallets, encrypt the user-provided private key
     const encryptionKey = this.generateEncryptionKey(userId);
     const encryptedKey = this.encryptPrivateKey(importWalletDto.privateKey, encryptionKey);
 
