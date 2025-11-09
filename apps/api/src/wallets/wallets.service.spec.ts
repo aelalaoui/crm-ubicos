@@ -72,7 +72,7 @@ describe('WalletsService', () => {
       jest.spyOn(sniperooService, 'createWallet').mockResolvedValueOnce(mockSniperooWallet);
       jest.spyOn(prismaService.wallet, 'create').mockResolvedValueOnce(mockDbWallet);
 
-      const result = await service.create('user-123', { name: 'Test Wallet' }, 'password');
+      const result = await service.create('user-123', { name: 'Test Wallet' });
 
       expect(result).toEqual(mockDbWallet);
       expect(sniperooService.createWallet).toHaveBeenCalledWith('Test Wallet');
