@@ -39,6 +39,13 @@ export class SniperooService {
     this.apiUrl = this.configService.get<string>('SNIPEROO_API_URL') || 'https://api.sniperoo.app';
     this.apiKey = this.configService.get<string>('SNIPEROO_API_KEY') || '';
 
+    if (!this.apiKey) {
+      this.logger.warn(
+        'SNIPEROO_API_KEY is not configured. Wallet creation will fail. ' +
+        'Please set SNIPEROO_API_KEY environment variable.',
+      );
+    }
+
     this.client = axios.create({
       baseURL: this.apiUrl,
       headers: {
@@ -47,6 +54,8 @@ export class SniperooService {
       },
       timeout: 30000,
     });
+
+    this.logger.log(`SniperooService initialized with API URL: ${this.apiUrl}`);
   }
 
   private async retryRequest<T>(fn: () => Promise<T>, operationName: string): Promise<T> {
@@ -97,7 +106,7 @@ export class SniperooService {
 
   async createWallet(name: string): Promise<SniperooCreateWalletResponse> {
     return this.retryRequest(async () => {
-      const response = await this.client.post<SniperooCreateWalletResponse>('/wallets', {
+      const response = await this.client.post<SniperooCreateWalletResponse>('/user/wallets', {
         name,
       });
       this.logger.log(`Wallet created: ${response.data.wallet.id}`);
@@ -107,7 +116,7 @@ export class SniperooService {
 
   async importWallet(name: string, privateKey: string): Promise<SniperooWallet> {
     return this.retryRequest(async () => {
-      const response = await this.client.post<SniperooWallet>('/wallets/import', {
+      const response = await this.client.post<SniperooWallet>('/user/wallets/import', {
         name,
         privateKey,
       });
@@ -118,35 +127,35 @@ export class SniperooService {
 
   async getWallet(walletId: string): Promise<SniperooWallet> {
     return this.retryRequest(async () => {
-      const response = await this.client.get<SniperooWallet>(`/wallets/${walletId}`);
+      const response = await this.client.get<SniperooWallet>(`/user/wallets/${walletId}`);
       return response.data;
     }, `getWallet(${walletId})`);
   }
 
   async listWallets(): Promise<SniperooListWalletsResponse> {
     return this.retryRequest(async () => {
-      const response = await this.client.get<SniperooListWalletsResponse>('/wallets');
+      const response = await this.client.get<SniperooListWalletsResponse>('/user/wallets');
       return response.data;
     }, 'listWallets');
   }
 
   async deleteWallet(walletId: string): Promise<void> {
     return this.retryRequest(async () => {
-      await this.client.delete(`/wallets/${walletId}`);
+      await this.client.delete(`/user/wallets/${walletId}`);
       this.logger.log(`Wallet deleted: ${walletId}`);
     }, `deleteWallet(${walletId})`);
   }
 
   async getWalletBalance(walletId: string): Promise<number> {
     return this.retryRequest(async () => {
-      const response = await this.client.get<{ balance: number }>(`/wallets/${walletId}/balance`);
+      const response = await this.client.get<{ balance: number }>(`/user/wallets/${walletId}/balance`);
       return response.data.balance;
     }, `getWalletBalance(${walletId})`);
   }
 
   async buy(params: SniperooTradeParams): Promise<SniperooTradeResponse> {
     return this.retryRequest(async () => {
-      const response = await this.client.post<SniperooTradeResponse>('/orders/buy', params);
+      const response = await this.client.post<SniperooTradeResponse>('/user/orders/buy', params);
       this.logger.log(`Buy order created: ${response.data.signature}`);
       return response.data;
     }, 'buy');
@@ -154,7 +163,7 @@ export class SniperooService {
 
   async sell(params: SniperooTradeParams): Promise<SniperooTradeResponse> {
     return this.retryRequest(async () => {
-      const response = await this.client.post<SniperooTradeResponse>('/orders/sell', params);
+      const response = await this.client.post<SniperooTradeResponse>('/user/orders/sell', params);
       this.logger.log(`Sell order created: ${response.data.signature}`);
       return response.data;
     }, 'sell');
@@ -163,7 +172,7 @@ export class SniperooService {
   async getPositions(walletId?: string): Promise<SniperooListPositionsResponse> {
     return this.retryRequest(async () => {
       const params = walletId ? { walletId } : {};
-      const response = await this.client.get<SniperooListPositionsResponse>('/positions', {
+      const response = await this.client.get<SniperooListPositionsResponse>('/user/positions', {
         params,
       });
       return response.data;
@@ -173,7 +182,7 @@ export class SniperooService {
   async getOrders(walletId?: string): Promise<SniperooListOrdersResponse> {
     return this.retryRequest(async () => {
       const params = walletId ? { walletId } : {};
-      const response = await this.client.get<SniperooListOrdersResponse>('/orders', { params });
+      const response = await this.client.get<SniperooListOrdersResponse>('/user/orders', { params });
       return response.data;
     }, 'getOrders');
   }
@@ -181,7 +190,7 @@ export class SniperooService {
   async closePosition(positionId: string): Promise<SniperooTradeResponse> {
     return this.retryRequest(async () => {
       const response = await this.client.post<SniperooTradeResponse>(
-        `/positions/${positionId}/close`,
+        `/user/positions/${positionId}/close`,
       );
       this.logger.log(`Position closed: ${positionId}`);
       return response.data;
