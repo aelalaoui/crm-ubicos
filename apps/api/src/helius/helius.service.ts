@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { RaydiumPool, TokenInfo } from '../dto/trading.types';
+import { RaydiumPool, TokenInfo } from '../trading/dto/trading.types';
 
 @Injectable()
 export class HeliusService {
@@ -147,3 +147,4 @@ export class HeliusService {
     }
   }
 }
+

@@ -82,9 +82,9 @@ export class TrailingStopStrategy extends BaseStrategy {
           const order = await this.orderExecutor.executeSell({
             walletId: position.walletId,
             tokenAddress: position.tokenAddress,
-            quantity: position.quantity,
+            amount: position.quantity,
             slippage: 2,
-            strategyId,
+            strategyId: strategyId!,
           });
 
           await this.positionManager.closePosition(config.positionId, currentPrice);

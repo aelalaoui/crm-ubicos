@@ -52,6 +52,10 @@ export interface SniperooTradeResponse {
   status: 'success' | 'failed';
   message?: string;
   orderId?: string;
+  price?: number;
+  amount?: number;
+  quantity?: number;
+  fee?: number;
 }
 
 export interface SniperooListWalletsResponse {

@@ -30,7 +30,11 @@ export class OrderExecutorService {
         throw new BadRequestException('Wallet not found');
       }
 
-      const result = await this.sniperooService.executeBuy({
+      if (!wallet.sniperooWalletId) {
+        throw new BadRequestException('Sniperoo wallet ID not configured');
+      }
+
+      const result = await this.sniperooService.buy({
         walletId: wallet.sniperooWalletId,
         tokenAddress: dto.tokenAddress,
         amount: dto.amount,
@@ -44,9 +48,9 @@ export class OrderExecutorService {
           signature: result.signature,
           tokenAddress: dto.tokenAddress,
           amount: dto.amount,
-          price: result.price,
-          totalValue: result.amount,
-          fee: result.fee,
+          price: result.price || 0,
+          totalValue: result.amount || 0,
+          fee: result.fee || 0,
           status: 'CONFIRMED',
           blockTime: new Date(),
         },
@@ -58,9 +62,9 @@ export class OrderExecutorService {
         signature: result.signature,
         tokenAddress: dto.tokenAddress,
         amount: dto.amount,
-        price: result.price,
-        quantity: result.quantity,
-        fee: result.fee,
+        price: result.price || 0,
+        quantity: result.quantity || 0,
+        fee: result.fee || 0,
         timestamp: new Date(),
       };
     } catch (error) {
@@ -83,10 +87,14 @@ export class OrderExecutorService {
         throw new BadRequestException('Wallet not found');
       }
 
-      const result = await this.sniperooService.executeSell({
+      if (!wallet.sniperooWalletId) {
+        throw new BadRequestException('Sniperoo wallet ID not configured');
+      }
+
+      const result = await this.sniperooService.sell({
         walletId: wallet.sniperooWalletId,
         tokenAddress: dto.tokenAddress,
-        quantity: dto.amount,
+        amount: dto.amount,
         slippage: dto.slippage,
       });
 
@@ -97,9 +105,9 @@ export class OrderExecutorService {
           signature: result.signature,
           tokenAddress: dto.tokenAddress,
           amount: dto.amount,
-          price: result.price,
-          totalValue: result.amount,
-          fee: result.fee,
+          price: result.price || 0,
+          totalValue: result.amount || 0,
+          fee: result.fee || 0,
           status: 'CONFIRMED',
           blockTime: new Date(),
         },
@@ -111,9 +119,9 @@ export class OrderExecutorService {
         signature: result.signature,
         tokenAddress: dto.tokenAddress,
         amount: dto.amount,
-        price: result.price,
-        quantity: result.quantity,
-        fee: result.fee,
+        price: result.price || 0,
+        quantity: result.quantity || 0,
+        fee: result.fee || 0,
         timestamp: new Date(),
       };
     } catch (error) {
@@ -158,3 +166,4 @@ export class OrderExecutorService {
     }
   }
 }
+

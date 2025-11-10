@@ -81,7 +81,7 @@ export function StrategyForm({ onSubmit, isLoading, defaultValues }: StrategyFor
             <FormField
               control={form.control}
               name="name"
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <FormItem>
                   <FormLabel>Strategy Name</FormLabel>
                   <FormControl>
@@ -95,7 +95,7 @@ export function StrategyForm({ onSubmit, isLoading, defaultValues }: StrategyFor
             <FormField
               control={form.control}
               name="description"
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <FormItem>
                   <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
@@ -109,11 +109,11 @@ export function StrategyForm({ onSubmit, isLoading, defaultValues }: StrategyFor
             <FormField
               control={form.control}
               name="type"
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <FormItem>
                   <FormLabel>Strategy Type</FormLabel>
                   <Select
-                    onValueChange={(value) => {
+                    onValueChange={(value: string) => {
                       field.onChange(value);
                       setSelectedType(value);
                       setConfigData({});
@@ -162,3 +162,4 @@ export function StrategyForm({ onSubmit, isLoading, defaultValues }: StrategyFor
     </Form>
   );
 }
+

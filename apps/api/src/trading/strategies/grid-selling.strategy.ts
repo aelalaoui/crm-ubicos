@@ -21,9 +21,10 @@ export class GridSellingStrategy extends BaseStrategy {
         throw new Error('Position ID is required for grid selling strategy');
       }
 
-      const position = await this.positionManager.getPosition(config.positionId);
+      const positionId = config.positionId as string;
+      const position = await this.positionManager.getPosition(positionId);
       if (!position) {
-        throw new Error(`Position ${config.positionId} not found`);
+        throw new Error(`Position ${positionId} not found`);
       }
 
       const startPrice = position.entryPrice;
@@ -44,17 +45,17 @@ export class GridSellingStrategy extends BaseStrategy {
               const order = await this.orderExecutor.executeSell({
                 walletId: position.walletId,
                 tokenAddress: position.tokenAddress,
-                quantity: sellQuantity,
+                amount: sellQuantity,
                 slippage: 2,
-                strategyId,
+                strategyId: strategyId!,
               });
 
-              await this.positionManager.updatePosition(config.positionId, {
+              await this.positionManager.updatePosition(positionId, {
                 quantity: position.quantity - sellQuantity,
               });
 
               await this.logExecution(strategyId, 'success', {
-                positionId: config.positionId,
+                positionId: positionId,
                 targetPrice,
                 sellQuantity,
                 order,
@@ -99,19 +100,21 @@ export class GridSellingStrategy extends BaseStrategy {
           return;
         }
 
-        if (Date.now() - startTime < maxWaitTime) {
-          setTimeout(checkPrice, checkInterval);
-        } else {
+        if (Date.now() - startTime > maxWaitTime) {
           this.logger.warn(
-            `Grid selling timeout for ${tokenAddress} at target ${targetPrice}`,
+            `Price target ${targetPrice} not reached within ${maxWaitTime}ms`,
           );
+          return;
         }
+
+        setTimeout(checkPrice, checkInterval);
       } catch (error) {
-        this.logger.error(`Error checking price for grid selling:`, error);
+        this.logger.error(`Error checking price:`, error);
         setTimeout(checkPrice, checkInterval);
       }
     };
 
-    checkPrice();
+    await checkPrice();
   }
 }
+
