@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Wallet, Settings, LogOut, User, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Wallet, Settings, LogOut, User, Menu, X, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 
 export function Sidebar() {
@@ -28,6 +28,11 @@ export function Sidebar() {
       label: 'Wallets',
       href: '/dashboard/wallets',
       icon: Wallet,
+    },
+    {
+      label: 'Strategies',
+      href: '/dashboard/strategies',
+      icon: TrendingUp,
     },
     {
       label: 'Profile',

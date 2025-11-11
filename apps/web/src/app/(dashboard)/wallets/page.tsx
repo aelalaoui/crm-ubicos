@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useWallets } from '@/lib/api/queries';
 import { WalletList } from '@/components/wallets/wallet-list';
 import { CreateWalletDialog } from '@/components/wallets/create-wallet-dialog';
 import { ImportWalletDialog } from '@/components/wallets/import-wallet-dialog';
 import { Button } from '@/components/ui/button';
-import { Plus, Download } from 'lucide-react';
+import { Plus, Download, TrendingUp } from 'lucide-react';
 
 export default function WalletsPage() {
+  const router = useRouter();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const { data: wallets = [], isLoading, error } = useWallets();
@@ -35,6 +37,10 @@ export default function WalletsPage() {
           <p className="text-gray-500 mt-1">Manage your Solana wallets</p>
         </div>
         <div className="flex gap-2">
+          <Button onClick={() => router.push('/dashboard/strategies')} variant="outline">
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Strategies
+          </Button>
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Create Wallet
